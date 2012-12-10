@@ -14,7 +14,7 @@ if not settings.configured:
             },
         },
         TEMPLATE_DIRS=(
-            os.path.join(os.path.dirname(__file__), 'templates'),
+            os.path.join(os.path.dirname(__file__), 'django_templates'),
         )
     )
 
@@ -24,7 +24,6 @@ if not settings.configured:
 import json
 import tempfile
 import unittest
-from cStringIO import StringIO
 
 from nose.plugins import PluginTester
 from django.template.loader import get_template
@@ -35,7 +34,7 @@ from templateusage import TemplateUsageReportPlugin
 class TemplateUsageReportTestMixin(PluginTester):
     TEMPLATE_NAME = 'example.html'
 
-    activate = '--with-template-usage-report'
+    activate = '--with-django-template-usage-report'
     plugins = [TemplateUsageReportPlugin()]
 
     def makeSuite(self):
