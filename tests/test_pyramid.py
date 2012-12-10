@@ -16,6 +16,9 @@ class TemplateUsageReportTestMixin(PluginTester):
     def makeSuite(self):
         class TestCase(unittest.TestCase):
             def runTest(_self):
+
+                import nose.tools
+                nose.tools.set_trace()
                 render(self.TEMPLATE_NAME, {})
         return unittest.TestSuite([TestCase()])
 

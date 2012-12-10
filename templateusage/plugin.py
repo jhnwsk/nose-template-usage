@@ -99,15 +99,14 @@ class TemplateUsageReportPlugin(Plugin):
             self.django_patch.start()
 
         if self.pyramid_enabled:
+            from pyramid.renderers import RendererHelper
             def register_pyramid_template_usage(name, *args, **kwargs):
-                import nose.tools
-                nose.tools.set_trace()
+                result = RendererHelper(name, *args, **kwargs)
                 self.used_templates.add(name)
-                return mock.DEFAULT
+                return result
 
             self.pyramid_patch = mock.patch('pyramid.renderers.RendererHelper',
-                                            side_effect=register_pyramid_template_usage,
-                                            autospec=True)
+                                            side_effect=register_pyramid_template_usage)
             self.pyramid_patch.start()
 
     def report(self, stream):
