@@ -39,7 +39,7 @@ def pyramid_template_lookup(directory, matches = ['*']):
         filtered = []
         for m in matches: filtered.extend(fnmatch.filter(filenames, m))
         for filename in filtered:
-            yield os.path.join(os.path.basename(dirpath), filename)
+            yield os.path.join(os.path.abspath(dirpath), filename)
 
 
 class TemplateUsageReportPlugin(Plugin):
@@ -107,15 +107,15 @@ class TemplateUsageReportPlugin(Plugin):
             self.django_patch.start()
 
         if self.pyramid_enabled:
-            from pyramid.renderers import RendererHelper
-            def register_pyramid_template_usage(name, *args, **kwargs):
-                result = RendererHelper(name, *args, **kwargs)
-                self.used_templates.add(name)
-                return result
+            from pyramid.chameleon_zpt import ZPTTemplateRenderer
+            def register_pyramid_render(*args, **kwargs):
+                self.used_templates.add(args[0])
+                return ZPTTemplateRenderer(*args, **kwargs)
 
-            self.pyramid_patch = mock.patch('pyramid.renderers.RendererHelper',
-                                            side_effect=register_pyramid_template_usage)
+            self.pyramid_patch = mock.patch('pyramid.chameleon_zpt.ZPTTemplateRenderer',
+                                            side_effect=register_pyramid_render)
             self.pyramid_patch.start()
+
 
     def report(self, stream):
         heading(stream, 'Used Templates (%s)' % len(self.used_templates))
