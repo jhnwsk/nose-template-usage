@@ -20,18 +20,26 @@ def bulleted(stream, values):
         print >> stream, ' * ', value
 
 
-def files(directory, matches = ['*']):
+def files(directory):
     """
     Returns a set of paths of all files located within the provided directory.
     """
     paths = set()
     for dirpath, dirnames, filenames in os.walk(directory):
-        filtered = []
-        for m in matches: filtered.extend(fnmatch.filter(filenames, m))
-        for filename in filtered:
+        for filename in filenames:
             path = os.path.join(dirpath, filename)
             paths.add(os.path.relpath(path, directory))
     return paths
+
+def pyramid_template_lookup(directory, matches = ['*']):
+    """
+    Returns a set of paths of all files located within the provided directory.
+    """
+    for dirpath, dirnames, filenames in os.walk(directory):
+        filtered = []
+        for m in matches: filtered.extend(fnmatch.filter(filenames, m))
+        for filename in filtered:
+            yield os.path.join(os.path.basename(dirpath), filename)
 
 
 class TemplateUsageReportPlugin(Plugin):
@@ -141,7 +149,7 @@ class TemplateUsageReportPlugin(Plugin):
                         available_templates.update(filter_ignored(files(directory)))
 
         if self.pyramid_enabled:
-            available_templates.update(files('.', self.pyramid_template_match))
+            available_templates.update(pyramid_template_lookup('.', self.pyramid_template_match))
 
         self.unused_templates = available_templates - self.used_templates
         heading(stream, 'Unused Templates (%s)' % len(self.unused_templates))

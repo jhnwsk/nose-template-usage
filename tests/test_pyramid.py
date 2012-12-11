@@ -29,17 +29,17 @@ class TemplateUsageReportPluginTestCase(TemplateUsageReportTestMixin, unittest.T
     def test_render(self):
         render(self.RENDER_TEMPLATE_NAME, {})
         self.assertIn(self.RENDER_TEMPLATE_NAME, self.plugins[0].used_templates)
-        self.assertIn('tests/pyramid_templates/unused.pt', self.plugins[0].unused_templates)
+        self.assertIn('pyramid_templates/unused.pt', self.plugins[0].unused_templates)
 
     def test_render_to_response(self):
         render_to_response(self.RENDER_TO_RESPONSE_TEMPLATE_NAME, {})
         self.assertIn(self.RENDER_TO_RESPONSE_TEMPLATE_NAME, self.plugins[0].used_templates)
-        self.assertIn('tests/pyramid_templates/unused.pt', self.plugins[0].unused_templates)
+        self.assertIn('pyramid_templates/unused.pt', self.plugins[0].unused_templates)
 
     def test_get_renderer(self):
         get_renderer(self.GET_RENDERER_TEMPLATE_NAME)
         self.assertIn(self.GET_RENDERER_TEMPLATE_NAME, self.plugins[0].used_templates)
-        self.assertIn('tests/pyramid_templates/unused.pt', self.plugins[0].unused_templates)
+        self.assertIn('pyramid_templates/unused.pt', self.plugins[0].unused_templates)
 
     def test_unused(self):
-        self.assertIn('tests/pyramid_templates/unused.pt', self.plugins[0].unused_templates)
+        self.assertIn('pyramid_templates/unused.pt', self.plugins[0].unused_templates)
