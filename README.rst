@@ -6,7 +6,7 @@ A Nose plugin that displays which Django and/or Pyramid Chameleon ZPT templates 
 
 Installation
 ------------
-* only django usage is available on pip *
+*only django usage is available on pip*
 ::
 
     pip install nose-template-usage
@@ -29,7 +29,7 @@ Pyramid
 
 Ignoring Directories
 ~~~~~~~~~~~~~~~~~~~~
-* not yet tested with pyramid *
+*not yet tested with pyramid*
 
 You probably don't want to include templates from third-party libraries in your
 template usage report. To ignore template prefixes, use the
