@@ -10,7 +10,6 @@ def get_version():
 
 
 install_requires = [
-    'django',
     'nose',
     'mock',
 ]
