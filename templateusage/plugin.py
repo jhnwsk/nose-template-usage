@@ -41,7 +41,6 @@ def pyramid_template_lookup(directory, matches = ['*']):
         for filename in filtered:
             yield os.path.join(os.path.abspath(dirpath), filename)
 
-
 class TemplateUsageReportPlugin(Plugin):
     enabled = False
     django_enabled = False
@@ -73,10 +72,18 @@ class TemplateUsageReportPlugin(Plugin):
             help='Write JSON template usage report to file.')
 
     def configure(self, options, conf):
-        self.django_enabled = options.django_enabled
+        def module_exists(module):
+            try:
+                __import__(module)
+            except:
+                return False
+            else:
+                return True
+
+        self.django_enabled = options.django_enabled and module_exists("django")
 
         self.pyramid_template_match = options.pyramid_template_match
-        self.pyramid_enabled = options.pyramid_enabled
+        self.pyramid_enabled = options.pyramid_enabled and module_exists("pyramid")
 
         self.enabled = self.django_enabled or self.pyramid_enabled
         if not self.enabled:
@@ -95,6 +102,7 @@ class TemplateUsageReportPlugin(Plugin):
 
         if self.django_enabled:
             from django.template.loader import find_template
+
             def register_django_template_usage(name, *args, **kwargs):
                 result = find_template(name, *args, **kwargs)
                 self.used_templates.add(name)
