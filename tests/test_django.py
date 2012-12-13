@@ -18,22 +18,22 @@ class TemplateUsageReportTestMixin(PluginTester):
         # Environment Bootstrapping
         try:
             from django.conf import settings
-
-            if not settings.configured:
-                settings.configure(
-                    INSTALLED_APPS=(),
-                    DATABASES={
-                        'default': {
-                            'ENGINE': 'django.db.backends.sqlite3',
-                            'NAME': ':memory:',
-                        },
-                    },
-                    TEMPLATE_DIRS=(
-                        os.path.join(os.path.dirname(__file__), 'django_templates'),
-                    )
-                )
         except ImportError:
             self.fail("django is not available")
+
+        if not settings.configured:
+            settings.configure(
+                INSTALLED_APPS=(),
+                DATABASES={
+                    'default': {
+                        'ENGINE': 'django.db.backends.sqlite3',
+                        'NAME': ':memory:',
+                    },
+                },
+                TEMPLATE_DIRS=(
+                    os.path.join(os.path.dirname(__file__), 'django_templates'),
+                )
+            )
 
         class TestCase(unittest.TestCase):
             def runTest(_self):
