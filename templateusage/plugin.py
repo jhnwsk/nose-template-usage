@@ -37,9 +37,11 @@ def pyramid_template_lookup(directory, matches = ['*']):
     """
     for dirpath, dirnames, filenames in os.walk(directory):
         filtered = []
-        for m in matches: filtered.extend(fnmatch.filter(filenames, m))
+        templates = [os.path.join(os.path.abspath(dirpath), filename) for filename in filenames]
+        for m in matches:
+            filtered.extend(fnmatch.filter(templates, m))
         for filename in filtered:
-            yield os.path.join(os.path.abspath(dirpath), filename)
+            yield filename
 
 class TemplateUsageReportPlugin(Plugin):
     enabled = False
@@ -115,20 +117,22 @@ class TemplateUsageReportPlugin(Plugin):
             self.django_patch.start()
 
         if self.pyramid_enabled:
+            self.unused_templates = set()
             from pyramid.chameleon_zpt import ZPTTemplateRenderer
+
             def register_pyramid_render(*args, **kwargs):
                 self.used_templates.add(args[0])
                 return ZPTTemplateRenderer(*args, **kwargs)
 
-            self.pyramid_patch = mock.patch('pyramid.chameleon_zpt.ZPTTemplateRenderer',
-                                            side_effect=register_pyramid_render)
-            self.pyramid_patch.start()
-
+            self.pyramid_render_patch = mock.patch('pyramid.chameleon_zpt.ZPTTemplateRenderer',
+                                                   side_effect=register_pyramid_render)
+            self.pyramid_render_patch.start()
 
     def report(self, stream):
         heading(stream, 'Used Templates (%s)' % len(self.used_templates))
         bulleted(stream, sorted(self.used_templates))
-        available_templates = set()
+
+        self.available_templates = set()
 
         if self.django_enabled:
             from django.conf import settings
@@ -149,17 +153,17 @@ class TemplateUsageReportPlugin(Plugin):
                 # actually instantiate the loaders multiple times.
                 if isinstance(loader, FileSystemLoader):
                     for directory in settings.TEMPLATE_DIRS:
-                        available_templates.update(filter_ignored(files(directory)))
+                        self.available_templates.update(filter_ignored(files(directory)))
 
                 elif isinstance(loader, AppDirectoryLoader):
                     from django.template.loaders.app_directories import app_template_dirs
                     for directory in app_template_dirs:
-                        available_templates.update(filter_ignored(files(directory)))
+                        self.available_templates.update(filter_ignored(files(directory)))
 
         if self.pyramid_enabled:
-            available_templates.update(pyramid_template_lookup('.', self.pyramid_template_match))
+            self.available_templates.update(pyramid_template_lookup('.', self.pyramid_template_match))
 
-        self.unused_templates = available_templates - self.used_templates
+        self.unused_templates = self.available_templates - self.used_templates
         heading(stream, 'Unused Templates (%s)' % len(self.unused_templates))
         bulleted(stream, sorted(self.unused_templates))
 
