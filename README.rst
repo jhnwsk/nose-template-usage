@@ -24,6 +24,9 @@ Pyramid
     command line option when running your tests with ``python setup.py nosetests``
     or the ``nosetests`` command.
 
+    To list the unused templates you must provide the ``--pyramid-template-match=unix*wildcard*match``.
+    Since Pyramid looks for templates anywhere you want it to.
+
     The plugin finds usage based on calls to ``pyramid.chameleon_zpt.ZPTTemplateRenderer`` which
     is the default Pyramid template renderer.
 
